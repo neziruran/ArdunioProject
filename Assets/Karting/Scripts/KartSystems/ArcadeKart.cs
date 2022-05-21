@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.VFX;
@@ -312,15 +313,14 @@ namespace KartGame.KartSystems
             // calculate how grounded and airborne we are
             GroundPercent = (float) groundedCount / 4.0f;
             AirPercent = 1 - GroundPercent;
-            if (UnityEngine.Input.GetKeyDown(KeyCode.Space) || !m_InAir)
+            if (UnityEngine.Input.GetKeyDown(KeyCode.Space) || ardunioScript.micValue >= 30 && !m_InAir)
             {
-                //Rigidbody.AddForce(Vector3.up*2000,ForceMode.Impulse);
+                Rigidbody.AddForce(Vector3.up*500,ForceMode.Impulse);
             }
             // apply vehicle physics
             if (m_CanMove)
             {
                 
-
                 MoveVehicle(Input.Accelerate, Input.Brake, Input.TurnInput);
             }
             GroundAirbourne();
@@ -328,6 +328,12 @@ namespace KartGame.KartSystems
             m_PreviousGroundPercent = GroundPercent;
 
             UpdateDriftVFXOrientation();
+        }
+
+        private IEnumerator Boost()
+        {
+            
+            yield return null;
         }
 
         void GatherInputs()
@@ -603,7 +609,16 @@ namespace KartGame.KartSystems
             }
 
             ActivateDriftVFX(IsDrifting && GroundPercent > 0.0f);
-
+            
+            float defaultValue = baseStats.Acceleration;
+            if (ardunioScript.lightSensorValue > 700)
+            {
+                baseStats.Acceleration = Mathf.Lerp(defaultValue, 15, .2f);
+            }
+            else
+            {
+                baseStats.Acceleration = Mathf.Lerp(defaultValue, 7, .2f);
+            }
            
         }
     }

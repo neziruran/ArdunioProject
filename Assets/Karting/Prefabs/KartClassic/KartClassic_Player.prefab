@@ -42,7 +42,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8df7c90d74154f4bbcc103ee5196b83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isStreaming: 0
+  isStreaming: 1
+  seperator: 59
+  splitArray: []
+  lightSensorValue: 0
+  micValue: 0
   directionInput: 0
 --- !u!1 &6643281549960510366
 GameObject:
@@ -371,7 +375,7 @@ PrefabInstance:
     - target: {fileID: 4895846115232909980, guid: cba6236a3ca88a54081cc989c4f0c08a,
         type: 3}
       propertyPath: m_Name
-      value: KartClassic_Player
+      value: NewKartClassic_Player
       objectReference: {fileID: 0}
     - target: {fileID: 4895846115232909980, guid: cba6236a3ca88a54081cc989c4f0c08a,
         type: 3}

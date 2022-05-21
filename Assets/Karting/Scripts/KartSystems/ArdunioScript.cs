@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO.Ports;
+using System.Linq;
 using System.Net;
 using TMPro;
 using UnityEngine.UI;
@@ -14,12 +15,17 @@ public class ArdunioScript : MonoBehaviour
     private int baudrate = 9600;
     private SerialPort ardunioPort;
     public bool isStreaming = false;
+
+    
+    public int lightSensorValue;
+    public int micValue = 0;
     public int directionInput = 0;
+
     private void Awake()
     {
         OpenConnection();
     }
-
+    
 
     void Update()
     {
@@ -27,56 +33,25 @@ public class ArdunioScript : MonoBehaviour
 
         if (isStreaming)
         {
-            ReadLog();
-            directionInput = GetDirectionInput();
+            GetInputs();
         }
 
-
-
     }
+   
+    public string[] splitArray;
+    public char seperator;
 
-    void OnDestroy()
-    {
-        CloseConnection();
-    }
-
-
-    private void ReadLog()
+    private void GetInputs()
     {
         string value = ReadSerialPort();
-        if (value != null)
-            Debug.Log(value);
+        var strings = value.Split(seperator);
+        splitArray = strings.ToArray();
+
+        directionInput = Int32.Parse(splitArray[0]);
+        micValue = Int32.Parse(splitArray[1]);
+        lightSensorValue = Int32.Parse(splitArray[2]);
     }
-
-    int GetDirectionInput(int timeout = 50)
-    {
-        string message;
-        ardunioPort.ReadTimeout = timeout;
-        try
-        {
-            message = ardunioPort.ReadLine();
-        }
-        catch (System.TimeoutException e)
-        {
-            Debug.LogWarning(e.Message);
-            return 0;
-        }
-
-        if (string.IsNullOrEmpty(message))
-        {
-            Debug.LogWarning("Message was null or empty.");
-            return 0;
-        }
-        int inputValue;
-        if (int.TryParse(message, out inputValue))
-            return inputValue;
-        else
-        {
-            Debug.LogWarning(message + " failed to parse.");
-            return 0;
-        }
-    }
-
+    
     string ReadSerialPort(int timeout = 50)
     {
         if (isStreaming)
@@ -84,18 +59,24 @@ public class ArdunioScript : MonoBehaviour
             string message;
             ardunioPort.ReadTimeout = timeout;
             message = ardunioPort.ReadLine();
-            if (message != null)
-                return message;
-            else
-            {
-                return "has timed out";
-            }
+            return message;
         }
         else
         {
             return "port is not open";
         }
     }
+    
+    
+    void OnDestroy()
+    {
+        CloseConnection();
+    }
+
+    
+ 
+
+    
 
     public void OpenConnection()
     {
